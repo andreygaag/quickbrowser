@@ -13,3 +13,13 @@ struct BrowserEntry {
             .lastPathComponent
     }
 }
+
+struct URLPattern {
+    let pattern: String
+    let browserKey: String
+
+    func matches(url: URL) -> Bool {
+        guard let host = url.host else { return false }
+        return host.contains(pattern) || url.absoluteString.contains(pattern)
+    }
+}

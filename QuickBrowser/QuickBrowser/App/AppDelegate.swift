@@ -70,8 +70,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             if alert.runModal() == .alertFirstButtonReturn {
                 let defaultConfig = """
                 # QuickBrowser Configuration
+                # Браузеры (формат: номер=путь)
                 1=/Applications/Safari.app
                 2=/Applications/Firefox.app
+
+                # Автоматический выбор (формат: паттерн номер)
+                # github.com 1
+                # huggingface.co 2
 
                 """
                 try? defaultConfig.write(toFile: configPath, atomically: true, encoding: .utf8)
@@ -85,7 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func showAbout() {
         let alert = NSAlert()
-        alert.messageText = "QuickBrowser v1.0"
+        alert.messageText = "QuickBrowser v1.2"
         alert.informativeText = """
         Минималистичное macOS приложение для быстрого выбора браузера.
 
@@ -93,6 +98,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         • Перехват http/https ссылок
         • CLI-подобный overlay интерфейс
         • Выбор браузера клавишами 1-9
+        • Автоматический выбор по URL-паттернам
         • Нет внешних зависимостей
 
         Конфигурация: ~/.config/quickbrowser
@@ -124,9 +130,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     private func handleURL(_ url: URL) {
         do {
-            let browsers = try config.load()
+            let configData = try config.load()
 
-            window = OverlayWindow(browsers: browsers) { [weak self] browser in
+            if let matchedPattern = configData.patterns.first(where: { $0.matches(url: url) }),
+               let browser = configData.browsers.first(where: { $0.key == matchedPattern.browserKey }) {
+                openBrowser(browser, withURL: url)
+                return
+            }
+
+            window = OverlayWindow(browsers: configData.browsers) { [weak self] browser in
                 self?.openBrowser(browser, withURL: url)
             }
 
@@ -140,10 +152,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             )
             NSApp.terminate(nil)
 
-        } catch ConfigError.invalidFormat(let line) {
+        } catch ConfigError.invalidFormat(let line, let content) {
             showAlert(
-                title: "Ошибка конфигурации",
-                message: "Неверный формат в строке \(line)"
+                title: "Ошибка конфигурации [v1.2.0]",
+                message: "Неверный формат в строке \(line):\n\"\(content)\""
             )
             NSApp.terminate(nil)
 
