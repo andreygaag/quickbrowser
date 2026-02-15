@@ -20,7 +20,7 @@ final class KeyboardHandler: NSView {
         guard let char = event.charactersIgnoringModifiers?.first else { return }
 
         if char == "\u{1B}" {
-            NSApp.terminate(nil)
+            self.window?.close()
         } else if let index = char.wholeNumberValue,
                   index > 0,
                   index <= browsers.count {

@@ -5,8 +5,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var pendingURL: URL?
     private let config = Config()
     private let launcher = Launcher()
+    private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        setupMenuBar()
+
         NSAppleEventManager.shared().setEventHandler(
             self,
             andSelector: #selector(handleGetURL(_:withReplyEvent:)),
@@ -17,6 +20,90 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let url = pendingURL {
             handleURL(url)
         }
+    }
+
+    private func setupMenuBar() {
+        statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+
+        if let button = statusItem?.button {
+            button.image = NSImage(systemSymbolName: "globe", accessibilityDescription: "QuickBrowser")
+            button.image?.isTemplate = true
+        }
+
+        let menu = NSMenu()
+
+        menu.addItem(NSMenuItem(
+            title: "Открыть конфигурацию",
+            action: #selector(openConfig),
+            keyEquivalent: ""
+        ))
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(
+            title: "О программе",
+            action: #selector(showAbout),
+            keyEquivalent: ""
+        ))
+
+        menu.addItem(NSMenuItem.separator())
+
+        menu.addItem(NSMenuItem(
+            title: "Выход",
+            action: #selector(quit),
+            keyEquivalent: "q"
+        ))
+
+        statusItem?.menu = menu
+    }
+
+    @objc private func openConfig() {
+        let configPath = ("~/.config/quickbrowser" as NSString).expandingTildeInPath
+
+        if !FileManager.default.fileExists(atPath: configPath) {
+            let alert = NSAlert()
+            alert.messageText = "Конфигурация не найдена"
+            alert.informativeText = "Создать файл ~/.config/quickbrowser?"
+            alert.addButton(withTitle: "Создать")
+            alert.addButton(withTitle: "Отмена")
+
+            if alert.runModal() == .alertFirstButtonReturn {
+                let defaultConfig = """
+                # QuickBrowser Configuration
+                1=/Applications/Safari.app
+                2=/Applications/Firefox.app
+
+                """
+                try? defaultConfig.write(toFile: configPath, atomically: true, encoding: .utf8)
+            } else {
+                return
+            }
+        }
+
+        NSWorkspace.shared.openFile(configPath, withApplication: "TextEdit")
+    }
+
+    @objc private func showAbout() {
+        let alert = NSAlert()
+        alert.messageText = "QuickBrowser v1.0"
+        alert.informativeText = """
+        Минималистичное macOS приложение для быстрого выбора браузера.
+
+        Возможности:
+        • Перехват http/https ссылок
+        • CLI-подобный overlay интерфейс
+        • Выбор браузера клавишами 1-9
+        • Нет внешних зависимостей
+
+        Конфигурация: ~/.config/quickbrowser
+        """
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+    }
+
+    @objc private func quit() {
+        NSApp.terminate(nil)
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
@@ -86,7 +173,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func openBrowser(_ browser: BrowserEntry, withURL url: URL) {
         do {
             try launcher.open(url: url, withBrowser: browser)
-            NSApp.terminate(nil)
+            window?.close()
+            window = nil
         } catch {
             showAlert(
                 title: "Ошибка запуска",
