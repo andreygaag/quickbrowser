@@ -2,24 +2,12 @@ import Cocoa
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var window: OverlayWindow?
-    private var pendingURL: URL?
     private let config = Config()
     private let launcher = Launcher()
     private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
-
-        NSAppleEventManager.shared().setEventHandler(
-            self,
-            andSelector: #selector(handleGetURL(_:withReplyEvent:)),
-            forEventClass: AEEventClass(kInternetEventClass),
-            andEventID: AEEventID(kAEGetURL)
-        )
-
-        if let url = pendingURL {
-            handleURL(url)
-        }
     }
 
     private func setupMenuBar() {
@@ -115,17 +103,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
         guard let url = urls.first else { return }
         handleURL(url)
-    }
-
-    @objc private func handleGetURL(_ event: NSAppleEventDescriptor, withReplyEvent: NSAppleEventDescriptor) {
-        guard let urlString = event.paramDescriptor(forKeyword: keyDirectObject)?.stringValue,
-              let url = URL(string: urlString) else { return }
-
-        if NSApp.isRunning {
-            handleURL(url)
-        } else {
-            pendingURL = url
-        }
     }
 
     private func handleURL(_ url: URL) {
