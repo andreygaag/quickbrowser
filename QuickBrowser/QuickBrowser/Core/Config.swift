@@ -14,9 +14,24 @@ struct ConfigData {
 
 final class Config {
     private let fileManager = FileManager.default
+    private static let configPath = ("~/.config/quickbrowser" as NSString).expandingTildeInPath
+
+    func hasPattern(for domain: String) -> Bool {
+        guard let content = try? String(contentsOfFile: Self.configPath, encoding: .utf8) else { return false }
+        return content.components(separatedBy: .newlines)
+            .filter { !$0.hasPrefix("#") && $0.contains(" ") && !$0.contains("=") }
+            .contains { $0.components(separatedBy: " ").first == domain }
+    }
+
+    func appendPattern(domain: String, browserKey: String) throws {
+        var content = (try? String(contentsOfFile: Self.configPath, encoding: .utf8)) ?? ""
+        if !content.hasSuffix("\n") { content += "\n" }
+        content += "\(domain) \(browserKey)\n"
+        try content.write(toFile: Self.configPath, atomically: true, encoding: .utf8)
+    }
 
     func load() throws -> ConfigData {
-        let configPath = ("~/.config/quickbrowser" as NSString).expandingTildeInPath
+        let configPath = Self.configPath
 
         guard fileManager.fileExists(atPath: configPath) else {
             throw ConfigError.fileNotFound

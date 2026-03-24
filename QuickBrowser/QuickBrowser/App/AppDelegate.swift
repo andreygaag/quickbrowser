@@ -4,6 +4,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var window: OverlayWindow?
     private let config = Config()
     private let launcher = Launcher()
+    private let learningTracker = LearningTracker()
+
+    private static let learningThreshold = 5
     private var statusItem: NSStatusItem?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -176,12 +179,40 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         do {
             try launcher.open(url: url, withBrowser: browser)
             window?.close()
+            if let domain = url.host {
+                checkLearning(domain: domain, browser: browser)
+            }
         } catch {
             showAlert(
                 title: "Ошибка запуска",
                 message: "Не удалось открыть браузер:\n\(error.localizedDescription)"
             )
         }
+    }
+
+    private func checkLearning(domain: String, browser: BrowserEntry) {
+        guard !config.hasPattern(for: domain) else { return }
+        let count = learningTracker.record(domain: domain, browserKey: browser.key)
+        guard count >= Self.learningThreshold else { return }
+        learningTracker.reset(domain: domain, browserKey: browser.key)
+        suggestPattern(domain: domain, browser: browser)
+    }
+
+    private func suggestPattern(domain: String, browser: BrowserEntry) {
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+
+        let alert = NSAlert()
+        alert.messageText = "Запомнить выбор?"
+        alert.informativeText = "Вы \(Self.learningThreshold) раз открывали \(domain) в \(browser.name). Всегда открывать в нём?"
+        alert.addButton(withTitle: "Запомнить")
+        alert.addButton(withTitle: "Не сейчас")
+
+        if alert.runModal() == .alertFirstButtonReturn {
+            try? config.appendPattern(domain: domain, browserKey: browser.key)
+        }
+
+        NSApp.setActivationPolicy(.accessory)
     }
 
     private func showAlert(title: String, message: String) {
