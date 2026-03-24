@@ -1,6 +1,6 @@
 import Cocoa
 
-final class AppDelegate: NSObject, NSApplicationDelegate {
+final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var window: OverlayWindow?
     private let config = Config()
     private let launcher = Launcher()
@@ -119,6 +119,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 self?.openBrowser(browser, withURL: url)
             }
 
+            NSApp.setActivationPolicy(.regular)
+            window?.delegate = self
             window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
 
@@ -159,11 +161,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
+    func windowWillClose(_ notification: Notification) {
+        window = nil
+        NSApp.setActivationPolicy(.accessory)
+    }
+
     private func openBrowser(_ browser: BrowserEntry, withURL url: URL) {
         do {
             try launcher.open(url: url, withBrowser: browser)
             window?.close()
-            window = nil
         } catch {
             showAlert(
                 title: "Ошибка запуска",
