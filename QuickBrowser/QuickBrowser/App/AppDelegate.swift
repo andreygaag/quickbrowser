@@ -115,6 +115,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
                 return
             }
 
+            guard window == nil else {
+                window?.makeKeyAndOrderFront(nil)
+                NSApp.activate(ignoringOtherApps: true)
+                return
+            }
+
             window = OverlayWindow(browsers: configData.browsers) { [weak self] browser in
                 self?.openBrowser(browser, withURL: url)
             }
