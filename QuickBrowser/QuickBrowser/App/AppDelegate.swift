@@ -5,6 +5,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private let config = Config()
     private let launcher = Launcher()
     private let learningTracker = LearningTracker()
+    private let usageTracker = UsageTracker()
 
     private static let learningThreshold = 5
     private var statusItem: NSStatusItem?
@@ -26,6 +27,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem(
             title: "Открыть конфигурацию",
             action: #selector(openConfig),
+            keyEquivalent: ""
+        ))
+
+        menu.addItem(NSMenuItem(
+            title: "Статистика",
+            action: #selector(showStats),
             keyEquivalent: ""
         ))
 
@@ -99,6 +106,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.runModal()
     }
 
+    @objc private func showStats() {
+        let summary: String
+        if let configData = try? config.load() {
+            summary = usageTracker.summary(browsers: configData.browsers)
+        } else {
+            summary = "Не удалось загрузить конфигурацию"
+        }
+
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+
+        let alert = NSAlert()
+        alert.messageText = "Статистика использования"
+        alert.informativeText = summary
+        alert.alertStyle = .informational
+        alert.addButton(withTitle: "OK")
+        alert.runModal()
+
+        NSApp.setActivationPolicy(.accessory)
+    }
+
     @objc private func quit() {
         NSApp.terminate(nil)
     }
@@ -114,7 +142,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
             if let matchedPattern = configData.patterns.first(where: { $0.matches(url: url) }),
                let browser = configData.browsers.first(where: { $0.key == matchedPattern.browserKey }) {
-                openBrowser(browser, withURL: url)
+                openBrowserAuto(browser, withURL: url)
                 return
             }
 
@@ -125,7 +153,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             }
 
             window = OverlayWindow(browsers: configData.browsers) { [weak self] browser in
-                self?.openBrowser(browser, withURL: url)
+                self?.openBrowserManually(browser, withURL: url)
             }
 
             NSApp.setActivationPolicy(.regular)
@@ -175,13 +203,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.setActivationPolicy(.accessory)
     }
 
-    private func openBrowser(_ browser: BrowserEntry, withURL url: URL) {
+    private func openBrowserManually(_ browser: BrowserEntry, withURL url: URL) {
+        launch(browser, url: url)
+        usageTracker.recordManual(browserKey: browser.key)
+        if let domain = url.host {
+            checkLearning(domain: domain, browser: browser)
+        }
+    }
+
+    private func openBrowserAuto(_ browser: BrowserEntry, withURL url: URL) {
+        launch(browser, url: url)
+        usageTracker.recordAuto(browserKey: browser.key)
+    }
+
+    private func launch(_ browser: BrowserEntry, url: URL) {
         do {
             try launcher.open(url: url, withBrowser: browser)
             window?.close()
-            if let domain = url.host {
-                checkLearning(domain: domain, browser: browser)
-            }
         } catch {
             showAlert(
                 title: "Ошибка запуска",
