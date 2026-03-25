@@ -1,7 +1,9 @@
 import Cocoa
+import SwiftUI
 
 final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private var window: OverlayWindow?
+    private var editorWindow: NSWindow?
     private let config = Config()
     private let launcher = Launcher()
     private let learningTracker = LearningTracker()
@@ -25,7 +27,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let menu = NSMenu()
 
         menu.addItem(NSMenuItem(
-            title: "Открыть конфигурацию",
+            title: "Редактировать конфигурацию",
             action: #selector(openConfig),
             keyEquivalent: ""
         ))
@@ -56,34 +58,42 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     @objc private func openConfig() {
-        let configPath = ("~/.config/quickbrowser" as NSString).expandingTildeInPath
-
-        if !FileManager.default.fileExists(atPath: configPath) {
-            let alert = NSAlert()
-            alert.messageText = "Конфигурация не найдена"
-            alert.informativeText = "Создать файл ~/.config/quickbrowser?"
-            alert.addButton(withTitle: "Создать")
-            alert.addButton(withTitle: "Отмена")
-
-            if alert.runModal() == .alertFirstButtonReturn {
-                let defaultConfig = """
-                # QuickBrowser Configuration
-                # Браузеры (формат: номер=путь)
-                1=/Applications/Safari.app
-                2=/Applications/Firefox.app
-
-                # Автоматический выбор (формат: паттерн номер)
-                # github.com 1
-                # huggingface.co 2
-
-                """
-                try? defaultConfig.write(toFile: configPath, atomically: true, encoding: .utf8)
-            } else {
-                return
-            }
+        guard editorWindow == nil else {
+            editorWindow?.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
         }
 
-        NSWorkspace.shared.openFile(configPath, withApplication: "TextEdit")
+        let configData = try? config.load()
+        let browsers = (configData?.browsers ?? []).map { EditableBrowser(key: $0.key, path: $0.path) }
+        let patterns = (configData?.patterns ?? []).map { EditablePattern(pattern: $0.pattern, browserKey: $0.browserKey) }
+
+        let view = ConfigEditorView(browsers: browsers, patterns: patterns) { [weak self] browsers, patterns in
+            self?.saveConfig(browsers: browsers, patterns: patterns)
+        }
+
+        let controller = NSHostingController(rootView: view)
+        let win = NSWindow(contentViewController: controller)
+        win.title = "QuickBrowser — Конфигурация"
+        win.styleMask = [.titled, .closable]
+        win.isReleasedWhenClosed = false
+        win.delegate = self
+        win.makeKeyAndOrderFront(nil)
+        NSApp.setActivationPolicy(.regular)
+        NSApp.activate(ignoringOtherApps: true)
+        editorWindow = win
+    }
+
+    private func saveConfig(browsers: [EditableBrowser], patterns: [EditablePattern]) {
+        var lines = ["# QuickBrowser Configuration", ""]
+        browsers.forEach { lines.append("\($0.key)=\($0.path)") }
+        if !patterns.isEmpty {
+            lines.append("")
+            patterns.forEach { lines.append("\($0.pattern) \($0.browserKey)") }
+        }
+        let configPath = ("~/.config/quickbrowser" as NSString).expandingTildeInPath
+        try? (lines.joined(separator: "\n") + "\n").write(toFile: configPath, atomically: true, encoding: .utf8)
+        editorWindow?.close()
     }
 
     @objc private func showAbout() {
@@ -199,8 +209,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func windowWillClose(_ notification: Notification) {
-        window = nil
-        NSApp.setActivationPolicy(.accessory)
+        let closed = notification.object as? NSWindow
+        if closed === window { window = nil }
+        if closed === editorWindow { editorWindow = nil }
+        if window == nil && editorWindow == nil {
+            NSApp.setActivationPolicy(.accessory)
+        }
     }
 
     private func openBrowserManually(_ browser: BrowserEntry, withURL url: URL) {

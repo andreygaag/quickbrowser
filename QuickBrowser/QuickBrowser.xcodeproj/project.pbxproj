@@ -13,6 +13,7 @@
 		A1000004 /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* Launcher.swift */; };
 		A1000009 /* LearningTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000011 /* LearningTracker.swift */; };
 		A1000010 /* UsageTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000012 /* UsageTracker.swift */; };
+		A1000011 /* ConfigEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000013 /* ConfigEditorView.swift */; };
 		A1000005 /* BrowserListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* BrowserListView.swift */; };
 		A1000006 /* KeyboardHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* KeyboardHandler.swift */; };
 		A1000007 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* OverlayWindow.swift */; };
@@ -26,6 +27,7 @@
 		A2000004 /* Launcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher.swift; sourceTree = "<group>"; };
 		A2000011 /* LearningTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningTracker.swift; sourceTree = "<group>"; };
 		A2000012 /* UsageTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsageTracker.swift; sourceTree = "<group>"; };
+		A2000013 /* ConfigEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigEditorView.swift; sourceTree = "<group>"; };
 		A2000005 /* BrowserListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserListView.swift; sourceTree = "<group>"; };
 		A2000006 /* KeyboardHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardHandler.swift; sourceTree = "<group>"; };
 		A2000007 /* OverlayWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayWindow.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 				A2000005 /* BrowserListView.swift */,
 				A2000006 /* KeyboardHandler.swift */,
 				A2000007 /* OverlayWindow.swift */,
+				A2000013 /* ConfigEditorView.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -179,6 +182,7 @@
 				A1000004 /* Launcher.swift in Sources */,
 				A1000009 /* LearningTracker.swift in Sources */,
 				A1000010 /* UsageTracker.swift in Sources */,
+				A1000011 /* ConfigEditorView.swift in Sources */,
 				A1000005 /* BrowserListView.swift in Sources */,
 				A1000006 /* KeyboardHandler.swift in Sources */,
 				A1000007 /* OverlayWindow.swift in Sources */,
