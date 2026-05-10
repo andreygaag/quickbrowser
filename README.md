@@ -54,7 +54,32 @@ QuickBrowser is the best fit when you want a lightweight, auditable default-brow
 
 ## Installation
 
-### 1. Build
+### Option A — Homebrew
+
+QuickBrowser can be installed from the Homebrew tap:
+
+```bash
+brew tap andreygaag/quickbrowser
+brew install --cask quickbrowser
+```
+
+QuickBrowser is not notarized yet. If macOS blocks the first launch, open **System Settings** → **Privacy & Security** and allow QuickBrowser there.
+
+Then set QuickBrowser as the default browser:
+
+1. Open **System Settings** → **Desktop & Dock**
+2. Scroll to **Default web browser**
+3. Choose **QuickBrowser**
+
+To uninstall:
+
+```bash
+brew uninstall --cask quickbrowser
+```
+
+### Option B — Build manually
+
+#### 1. Build
 
 Open the project in Xcode:
 
@@ -78,7 +103,7 @@ The Release build lands in:
 ~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Release/QuickBrowser.app
 ```
 
-### 2. Copy to Applications
+#### 2. Copy to Applications
 
 ```bash
 cp -R ~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Release/QuickBrowser.app \
@@ -87,7 +112,7 @@ cp -R ~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Releas
 
 Or drag `QuickBrowser.app` into `/Applications` manually. Installation in `/Applications` is required — macOS only registers URL handlers for apps placed there.
 
-### 3. Set as default browser
+#### 3. Set as default browser
 
 **Option A — System Settings (recommended)**
 
@@ -103,7 +128,7 @@ open /Applications/QuickBrowser.app
 
 macOS will register it as a URL handler. Then set it as default in System Settings.
 
-### 4. Verify
+#### 4. Verify
 
 ```bash
 open -a /Applications/QuickBrowser.app "https://github.com"
@@ -183,4 +208,4 @@ Click the globe icon in the menu bar:
 
 ## Version
 
-**v1.2** — Pattern-based routing, auto-learning, usage statistics, SwiftUI config editor
+**v1.3.0** — Pattern-based routing, auto-learning, usage statistics, SwiftUI config editor

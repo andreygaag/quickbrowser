@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build release app
+    runs-on: macos-15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Read version
+        id: version
+        run: |
+          VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" QuickBrowser/QuickBrowser/App/Info.plist)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Validate release ref
+        run: |
+          test "$GITHUB_REF" = "refs/tags/v${{ steps.version.outputs.version }}"
+          test "$GITHUB_REF_NAME" = "v${{ steps.version.outputs.version }}"
+
+      - name: Build
+        run: |
+          xcodebuild \
+            -project QuickBrowser/QuickBrowser.xcodeproj \
+            -scheme QuickBrowser \
+            -configuration Release \
+            -destination generic/platform=macOS \
+            -derivedDataPath "$RUNNER_TEMP/quickbrowser-derived" \
+            ONLY_ACTIVE_ARCH=NO \
+            clean build
+
+      - name: Package
+        run: |
+          cd "$RUNNER_TEMP/quickbrowser-derived/Build/Products/Release"
+          zip -r -X "$GITHUB_WORKSPACE/QuickBrowser-${{ steps.version.outputs.version }}.zip" QuickBrowser.app
+          shasum -a 256 "$GITHUB_WORKSPACE/QuickBrowser-${{ steps.version.outputs.version }}.zip" > "$GITHUB_WORKSPACE/QuickBrowser-${{ steps.version.outputs.version }}.zip.sha256"
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.version.outputs.version }}
+          fail_on_unmatched_files: true
+          files: |
+            QuickBrowser-${{ steps.version.outputs.version }}.zip
+            QuickBrowser-${{ steps.version.outputs.version }}.zip.sha256
