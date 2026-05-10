@@ -137,3 +137,4 @@ Temporary Items
 # Local configuration (keep template, ignore actual config)
 .env
 .env.local
+buildServer.json

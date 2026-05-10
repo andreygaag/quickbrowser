@@ -25,6 +25,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
+        promptForDefaultBrowserOnFirstLaunch()
+    }
+
+    private func promptForDefaultBrowserOnFirstLaunch() {
+        let key = "hasPromptedDefaultBrowser"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        UserDefaults.standard.set(true, forKey: key)
+
+        let currentDefault = NSWorkspace.shared.urlForApplication(toOpen: URL(string: "https://")!)
+        guard currentDefault?.lastPathComponent != "QuickBrowser.app" else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            let alert = NSAlert()
+            alert.messageText = "Браузер по умолчанию"
+            alert.informativeText = "QuickBrowser может перехватывать ссылки, если установлен браузером по умолчанию.\n\nВ настройках выберите QuickBrowser из списка."
+            alert.alertStyle = .informational
+            alert.addButton(withTitle: "Открыть настройки")
+            alert.addButton(withTitle: "Позже")
+            if alert.runModal() == .alertFirstButtonReturn {
+                self.openDefaultBrowserSettings()
+            }
+        }
     }
 
     private func setupMenuBar() {
@@ -40,6 +62,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem(
             title: "Редактировать конфигурацию",
             action: #selector(openConfig),
+            keyEquivalent: ""
+        ))
+
+        menu.addItem(NSMenuItem(
+            title: "Сделать браузером по умолчанию",
+            action: #selector(switchDefaultBrowser),
             keyEquivalent: ""
         ))
 
@@ -150,6 +178,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     @objc private func quit() {
         NSApp.terminate(nil)
+    }
+
+    @objc private func switchDefaultBrowser() {
+        openDefaultBrowserSettings()
+    }
+
+    private func openDefaultBrowserSettings() {
+        NSWorkspace.shared.open(URL(string: "x-apple.systempreferences:com.apple.Desktop-Settings.extension")!)
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
