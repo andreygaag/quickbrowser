@@ -12,6 +12,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     private static let learningThreshold = 5
     private var statusItem: NSStatusItem?
 
+    private func loadOrCreateConfig() -> ConfigData? {
+        do {
+            return try config.load()
+        } catch ConfigError.fileNotFound {
+            try? config.createDefault()
+            return try? config.load()
+        } catch {
+            return nil
+        }
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         setupMenuBar()
     }
@@ -64,7 +75,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             return
         }
 
-        let configData = try? config.load()
+        let configData = loadOrCreateConfig()
         let browsers = (configData?.browsers ?? []).map { EditableBrowser(key: $0.key, path: $0.path) }
         let patterns = (configData?.patterns ?? []).map { EditablePattern(pattern: $0.pattern, browserKey: $0.browserKey) }
 
@@ -118,7 +129,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     @objc private func showStats() {
         let summary: String
-        if let configData = try? config.load() {
+        if let configData = loadOrCreateConfig() {
             summary = usageTracker.summary(browsers: configData.browsers)
         } else {
             summary = "Не удалось загрузить конфигурацию"
@@ -147,8 +158,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func handleURL(_ url: URL) {
+        guard let configData = loadOrCreateConfig() else {
+            showAlert(title: "Ошибка", message: "Не удалось загрузить конфигурацию")
+            NSApp.terminate(nil)
+            return
+        }
+
         do {
-            let configData = try config.load()
 
             if let matchedPattern = configData.patterns.first(where: { $0.matches(url: url) }),
                let browser = configData.browsers.first(where: { $0.key == matchedPattern.browserKey }) {
@@ -170,13 +186,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window?.delegate = self
             window?.makeKeyAndOrderFront(nil)
             NSApp.activate(ignoringOtherApps: true)
-
-        } catch ConfigError.fileNotFound {
-            showAlert(
-                title: "Конфигурация не найдена",
-                message: "Создайте файл ~/.config/quickbrowser\nФормат: 1=/Applications/Safari.app"
-            )
-            NSApp.terminate(nil)
 
         } catch ConfigError.invalidFormat(let line, let content) {
             showAlert(

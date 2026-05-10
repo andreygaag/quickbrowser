@@ -104,4 +104,10 @@ final class Config {
             autolearn: autolearn
         )
     }
+
+    func createDefault() throws {
+        let safariPath = "/Applications/Safari.app"
+        let content = "# QuickBrowser Configuration\n\n1=\(safariPath)\n"
+        try content.write(toFile: Self.configPath, atomically: true, encoding: .utf8)
+    }
 }
