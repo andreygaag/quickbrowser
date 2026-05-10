@@ -1,140 +1,145 @@
 # QuickBrowser
 
-Минималистичный менеджер браузеров для macOS с автоматическим выбором по URL-паттернам.
+A minimalist browser picker for macOS. Intercepts http/https links and either opens them in a chosen browser or routes them automatically based on URL patterns.
 
-## Установка
+## Features
 
-```bash
-cp -R QuickBrowser.app /Applications/
-```
+- **Browser picker overlay** — keyboard-first, pick a browser with keys `1`–`9`
+- **Pattern-based routing** — URLs matching a pattern open in the assigned browser without prompting
+- **Auto-learning** — after picking the same browser for a domain 5 times, QuickBrowser offers to remember the choice (or saves it silently if `autolearn=true`)
+- **Usage statistics** — see how often each browser is used (manual vs. automatic)
+- **SwiftUI config editor** — manage browsers and patterns from the menu bar
+- **Zero dependencies** — single small Swift binary
 
-## Конфигурация
+## Installation
 
-Создайте файл `~/.config/quickbrowser`:
+### 1. Build
 
-```
-# Браузеры (формат: номер=путь)
-1=/Applications/Safari.app
-2=/Applications/Firefox.app
-3=/Applications/Chrome.app
-
-# Автоматический выбор (формат: паттерн номер)
-github.com 2
-openai.com 1
-yandex.ru 3
-```
-
-## Использование
-
-После установки QuickBrowser перехватывает http/https ссылки:
-
-- **Если URL совпадает с паттерном** → браузер открывается автоматически
-- **Если паттерна нет** → появляется окно выбора (клавиши 1-9)
-- **ESC** → закрыть окно выбора
-
-## Паттерны
-
-Паттерны проверяются по хосту и полному URL:
-- `github.com` → совпадет с `https://github.com/...`
-- `api.example.com` → совпадет только с поддоменом api
-- `stackoverflow` → совпадет с любым URL содержащим "stackoverflow"
-
-## Сборка
-
-### Сборка в Xcode
-
-1. Откройте проект:
-   ```bash
-   open QuickBrowser/QuickBrowser.xcodeproj
-   ```
-
-2. В Xcode выберите схему **QuickBrowser** и устройство **My Mac**
-
-3. Сборка:
-   - **Debug**: `Product` → `Build` (⌘B)
-   - **Release**: `Product` → `Archive` или используйте командную строку
-
-### Сборка через Terminal
+Open the project in Xcode:
 
 ```bash
-# Release сборка (рекомендуется для установки)
+open QuickBrowser/QuickBrowser.xcodeproj
+```
+
+Select the **QuickBrowser** scheme with **My Mac** as target, then `Product` → `Build` (⌘B), or build a Release artifact from the terminal:
+
+```bash
 cd QuickBrowser
 xcodebuild -project QuickBrowser.xcodeproj \
            -scheme QuickBrowser \
            -configuration Release \
            clean build
-
-# Результат будет в:
-# ~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Release/QuickBrowser.app
 ```
 
-## Установка
+The Release build lands in:
 
-### 1. Скопировать в Applications
+```
+~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Release/QuickBrowser.app
+```
+
+### 2. Copy to Applications
 
 ```bash
-# После сборки Release
 cp -R ~/Library/Developer/Xcode/DerivedData/QuickBrowser-*/Build/Products/Release/QuickBrowser.app \
       /Applications/
-
-# Или вручную перетащите QuickBrowser.app в /Applications
 ```
 
-### 2. Регистрация как браузер по умолчанию
+Or drag `QuickBrowser.app` into `/Applications` manually. Installation in `/Applications` is required — macOS only registers URL handlers for apps placed there.
 
-После установки в `/Applications` зарегистрируйте QuickBrowser как обработчик http/https:
+### 3. Set as default browser
 
-**Способ 1: Через системные настройки (рекомендуется)**
+**Option A — System Settings (recommended)**
 
-1. Откройте **Системные настройки** → **Рабочий стол и Dock**
-2. Прокрутите вниз до раздела **Браузер по умолчанию**
-3. Выберите **QuickBrowser** из списка
+1. Open **System Settings** → **Desktop & Dock**
+2. Scroll to **Default web browser**
+3. Choose **QuickBrowser**
 
-**Способ 2: Через командную строку**
+**Option B — Launch once**
 
 ```bash
-# Открыть QuickBrowser один раз для регистрации
 open /Applications/QuickBrowser.app
-
-# Затем система автоматически зарегистрирует его как обработчик URL
 ```
 
-**Способ 3: Принудительная регистрация**
+macOS will register it as a URL handler. Then set it as default in System Settings.
+
+### 4. Verify
 
 ```bash
-defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add \
-  '{LSHandlerURLScheme=http;LSHandlerRoleAll=com.user.quickbrowser.v2;}'
-defaults write com.apple.LaunchServices/com.apple.launchservices.secure LSHandlers -array-add \
-  '{LSHandlerURLScheme=https;LSHandlerRoleAll=com.user.quickbrowser.v2;}'
-
-# Перезапустить Launch Services
-killall Finder
-```
-
-### 3. Проверка работы
-
-```bash
-# Тест через терминал
 open -a /Applications/QuickBrowser.app "https://github.com"
-
-# Должен открыться браузер согласно конфигу
 ```
 
-## Первый запуск
+The configured browser should open (or the picker overlay if no pattern matches).
 
-1. Запустите QuickBrowser:
-   ```bash
-   open /Applications/QuickBrowser.app
-   ```
+## Configuration
 
-2. В menu bar появится иконка глобуса 🌐
+Create `~/.config/quickbrowser`:
 
-3. Нажмите на иконку → **Открыть конфигурацию**
+```
+# Settings
+autolearn=true
 
-4. Настройте браузеры и паттерны в `~/.config/quickbrowser`
+# Browsers — format: key=path
+1=/Applications/Safari.app
+2=/Applications/Firefox.app
+3=/Applications/Google Chrome.app
 
-5. Теперь при клике на любую ссылку в других приложениях запустится QuickBrowser
+# Patterns — format: pattern browser_key
+github.com 2
+openai.com 1
+stackoverflow 2
+```
 
-## Версия
+You can also edit the config from the menu bar: click the globe icon → **Edit configuration**.
 
-**v1.2.0** — Автоматический выбор браузера по URL-паттернам
+### Config rules
+
+- Lines starting with `#` are comments
+- Empty lines are ignored
+- `autolearn=true` saves learned patterns silently; otherwise QuickBrowser asks for confirmation
+- Browser keys must be digits (`1`–`9`)
+- Browser paths must exist
+- Patterns are evaluated in file order — the **first** match wins
+
+## Usage
+
+After installation, QuickBrowser intercepts every http/https click:
+
+- **URL matches a pattern** → opens automatically in the assigned browser
+- **No match** → overlay appears; press `1`–`9` to pick, `Esc` to cancel
+- **Same domain picked 5 times in a row** → QuickBrowser offers to add a pattern (or auto-adds it with `autolearn=true`)
+
+## Pattern matching
+
+Patterns are matched against both the URL host and the full URL string:
+
+| Pattern | Matches |
+|---------|---------|
+| `github.com` | `https://github.com/...`, `https://api.github.com/...` |
+| `api.example.com` | only the `api` subdomain |
+| `stackoverflow` | any URL containing `stackoverflow` |
+
+## Menu bar
+
+Click the globe icon in the menu bar:
+
+- **Edit configuration** — open the SwiftUI editor for browsers and patterns
+- **Statistics** — show usage counts (manual vs. automatic) per browser
+- **About** — version and feature summary
+- **Quit** — exit QuickBrowser
+
+## Troubleshooting
+
+**Links don't open in QuickBrowser**
+- Confirm `QuickBrowser.app` is in `/Applications` (not Downloads or Desktop)
+- Re-select QuickBrowser as the default browser in System Settings
+- If macOS caches an old version, change the Bundle ID and rebuild
+
+**"Configuration not found"**
+- Create `~/.config/quickbrowser` with at least one browser line, e.g. `1=/Applications/Safari.app`
+
+**"Browser not found"**
+- Verify the path in the config is correct and the `.app` exists
+
+## Version
+
+**v1.2** — Pattern-based routing, auto-learning, usage statistics, SwiftUI config editor
