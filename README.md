@@ -2,16 +2,10 @@
 
 A minimalist browser picker for macOS. Intercepts http/https links and either opens them in a chosen browser or routes them automatically based on URL patterns.
 
-<table>
-  <tr>
-    <td align="center"><img src="screenshots/picker.png" alt="Browser picker overlay" width="380"><br><sub>Browser picker overlay</sub></td>
-    <td align="center"><img src="screenshots/config-editor.png" alt="Configuration editor" width="380"><br><sub>Configuration editor</sub></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="screenshots/statistics.png" alt="Usage statistics" width="380"><br><sub>Usage statistics</sub></td>
-    <td align="center"><img src="screenshots/about.png" alt="About dialog" width="380"><br><sub>About dialog</sub></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="screenshots/picker.png" alt="Browser picker overlay" width="380"><br>
+  <sub>Browser picker overlay</sub>
+</p>
 
 ## Features
 
