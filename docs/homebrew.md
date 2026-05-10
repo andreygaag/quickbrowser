@@ -63,8 +63,14 @@ Then validate the cask from inside the tap repository:
 
 ```bash
 brew style --cask Casks/quickbrowser.rb
-brew audit --cask --new quickbrowser
+brew audit --cask quickbrowser
 brew install --cask quickbrowser
+```
+
+`brew audit --cask --new` is intended for casks proposed to the official Homebrew cask repository. For this personal tap it will fail until the app is notarized and the GitHub repository meets Homebrew's notability thresholds. If you still want the extra `--new` checks locally, skip those two official-repository policy checks:
+
+```bash
+brew audit --cask --new --no-signing --except=github_repository quickbrowser
 ```
 
 ## Notarization

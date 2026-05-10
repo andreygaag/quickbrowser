@@ -64,7 +64,14 @@ brew tap andreygaag/quickbrowser
 brew install --cask quickbrowser
 ```
 
-QuickBrowser is not notarized yet. If macOS blocks the first launch, open **System Settings** → **Privacy & Security** and allow QuickBrowser there.
+QuickBrowser is not notarized yet. If macOS blocks the first launch with "Apple could not verify QuickBrowser.app is free of malware", allow it once:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/QuickBrowser.app
+open /Applications/QuickBrowser.app
+```
+
+You can also allow it from **System Settings** → **Privacy & Security** → **Open Anyway**.
 
 Then set QuickBrowser as the default browser:
 
