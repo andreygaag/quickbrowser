@@ -81,6 +81,11 @@ struct ConfigEditorView: View {
                         Spacer()
                         Text("→ \(browsers.first { $0.key == p.browserKey }?.name ?? p.browserKey)")
                             .foregroundColor(.secondary)
+                        Button(action: { patterns.removeAll { $0.id == p.id } }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
                     }
                 }
                 .onDelete { patterns.remove(atOffsets: $0) }
