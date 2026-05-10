@@ -51,6 +51,7 @@ jobs:
         with:
           tag_name: v${{ steps.version.outputs.version }}
           fail_on_unmatched_files: true
+          overwrite_files: true
           files: |
             QuickBrowser-${{ steps.version.outputs.version }}.zip
             QuickBrowser-${{ steps.version.outputs.version }}.zip.sha256
