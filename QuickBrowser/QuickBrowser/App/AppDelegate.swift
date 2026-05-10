@@ -251,6 +251,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     private func suggestPattern(domain: String, browser: BrowserEntry) {
+        if (try? config.load())?.autolearn == true {
+            try? config.appendPattern(domain: domain, browserKey: browser.key)
+            return
+        }
+
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
 
@@ -259,6 +264,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.informativeText = "Вы \(Self.learningThreshold) раз открывали \(domain) в \(browser.name). Всегда открывать в нём?"
         alert.addButton(withTitle: "Запомнить")
         alert.addButton(withTitle: "Не сейчас")
+
+        let alertWindow = alert.window
+        alertWindow.level = .floating
 
         if alert.runModal() == .alertFirstButtonReturn {
             try? config.appendPattern(domain: domain, browserKey: browser.key)

@@ -10,6 +10,7 @@ enum ConfigError: Error {
 struct ConfigData {
     let browsers: [BrowserEntry]
     let patterns: [URLPattern]
+    let autolearn: Bool
 }
 
 final class Config {
@@ -48,13 +49,22 @@ final class Config {
 
         var browsers: [BrowserEntry] = []
         var patterns: [URLPattern] = []
+        var autolearn = false
 
         for (index, line) in lines.enumerated() {
             if line.contains("=") {
                 let parts = line.split(separator: "=", maxSplits: 1)
 
-                guard parts.count == 2,
-                      let key = parts[0].first,
+                guard parts.count == 2 else {
+                    throw ConfigError.invalidFormat(line: index + 1, content: line)
+                }
+
+                if parts[0] == "autolearn" {
+                    autolearn = String(parts[1]).lowercased() == "true"
+                    continue
+                }
+
+                guard let key = parts[0].first,
                       key.isNumber else {
                     throw ConfigError.invalidFormat(line: index + 1, content: line)
                 }
@@ -90,7 +100,8 @@ final class Config {
 
         return ConfigData(
             browsers: browsers.sorted { $0.key < $1.key },
-            patterns: patterns
+            patterns: patterns,
+            autolearn: autolearn
         )
     }
 }
