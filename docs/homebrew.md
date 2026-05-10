@@ -29,6 +29,24 @@ git push origin main
 
 ## Release flow
 
+### Automated
+
+After updating the app code, version, and README, run:
+
+```bash
+scripts/release-homebrew.sh
+```
+
+The script reads `CFBundleShortVersionString`, creates/pushes `v<version>` if needed, runs the GitHub release workflow, waits for it to finish, downloads the published `.sha256`, updates `Casks/quickbrowser.rb`, copies it into the Homebrew tap, and validates the tap cask.
+
+By default it leaves commits for review. To commit and push both repositories automatically:
+
+```bash
+COMMIT_AND_PUSH=1 scripts/release-homebrew.sh
+```
+
+### Manual
+
 1. Update `CFBundleShortVersionString` in `QuickBrowser/QuickBrowser/App/Info.plist`.
 2. Update the README version text.
 3. Tag the app repository:

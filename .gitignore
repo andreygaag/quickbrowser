@@ -138,3 +138,7 @@ Temporary Items
 .env
 .env.local
 buildServer.json
+
+# Release artifacts
+QuickBrowser-*.zip
+QuickBrowser-*.zip.sha256
