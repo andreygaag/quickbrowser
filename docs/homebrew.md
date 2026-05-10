@@ -43,7 +43,13 @@ The release workflow uploads:
 - `QuickBrowser-1.3.0.zip`
 - `QuickBrowser-1.3.0.zip.sha256`
 
-The release workflow only publishes from a tag named `v<CFBundleShortVersionString>`. A manual `workflow_dispatch` run from a branch will fail before uploading assets, so it cannot overwrite an existing release with a branch build.
+The release workflow publishes to a tag named `v<CFBundleShortVersionString>`. On tag pushes, the pushed tag must match the app version. On manual runs, pass the existing release tag explicitly:
+
+```bash
+gh workflow run release.yml -f release_tag=v1.3.0
+```
+
+Manual runs fail before uploading assets if `release_tag` does not match `CFBundleShortVersionString`.
 
 The workflow builds a universal macOS app (`arm64` and `x86_64`) on the pinned `macos-15` runner.
 

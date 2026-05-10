@@ -5,6 +5,11 @@ on:
     tags:
       - "v*.*.*"
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Existing GitHub Release tag to update, e.g. v1.3.0"
+        required: true
+        default: "v1.3.0"
 
 permissions:
   contents: write
@@ -24,10 +29,20 @@ jobs:
           VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" QuickBrowser/QuickBrowser/App/Info.plist)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Validate release ref
+      - name: Validate release target
+        id: release
         run: |
-          test "$GITHUB_REF" = "refs/tags/v${{ steps.version.outputs.version }}"
-          test "$GITHUB_REF_NAME" = "v${{ steps.version.outputs.version }}"
+          EXPECTED_TAG="v${{ steps.version.outputs.version }}"
+
+          if [ "${{ github.event_name }}" = "push" ]; then
+            test "$GITHUB_REF" = "refs/tags/$EXPECTED_TAG"
+            RELEASE_TAG="$GITHUB_REF_NAME"
+          else
+            test "${{ inputs.release_tag }}" = "$EXPECTED_TAG"
+            RELEASE_TAG="${{ inputs.release_tag }}"
+          fi
+
+          echo "release_tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
 
       - name: Build
         run: |
@@ -49,7 +64,7 @@ jobs:
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.release.outputs.release_tag }}
           fail_on_unmatched_files: true
           overwrite_files: true
           files: |
