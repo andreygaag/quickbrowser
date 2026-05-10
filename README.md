@@ -22,6 +22,28 @@ A minimalist browser picker for macOS. Intercepts http/https links and either op
 - **SwiftUI config editor** — manage browsers and patterns from the menu bar
 - **Zero dependencies** — single small Swift binary
 
+## Comparison
+
+| | QuickBrowser | [Browserosaurus](https://github.com/will-stone/browserosaurus) | [OpenIn](https://loshadki.app/openin4/) | [Choosy](https://choosy.app/) |
+|---|---|---|---|---|
+| **License** | MIT | MIT (archived) | Proprietary | Proprietary |
+| **Price** | Free | Free | $9.99 / Setapp | $10 one-time |
+| **Maintained** | Yes | No (archived 2025) | Yes | Yes |
+| **Tech** | Native Swift | Electron | Native | Native |
+| **App size** | ~2 MB | ~150 MB | — | — |
+| **Notarized** | No | Yes | Yes | Yes |
+| **Config** | Plain text + GUI | GUI | GUI | GUI |
+| **URL pattern rules** | Yes | Yes | Yes | Yes (advanced) |
+| **Auto-learning** | Yes | No | No | No |
+| **Source-app rules** | No | No | Yes | Yes |
+| **Browser profiles** | No | No | Yes | Yes |
+| **Time-of-day rules** | No | No | No | Yes |
+| **mailto / files** | No | No | Yes | No |
+| **Usage statistics** | Yes | No | No | No |
+| **Keyboard picker (1-9)** | Yes | Yes | Yes | Yes |
+
+QuickBrowser's niche: small native binary, plain-text config you can grep/version-control, and auto-learning that builds the rule set for you. If you need source-app rules, browser profiles, or mailto/file routing, OpenIn or Choosy will fit better.
+
 ## Installation
 
 ### 1. Build
