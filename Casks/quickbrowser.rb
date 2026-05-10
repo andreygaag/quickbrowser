@@ -1,6 +1,6 @@
 cask "quickbrowser" do
   version "1.3.0"
-  sha256 "64ad7b0250b1c8e289c1917e18fd2e5445136a7f4e19727f98e3544f67d3c0d5"
+  sha256 "497a9245e33499459a10948f887ce0d66d1edad7cbf7b107b85164a25cf68285"
 
   url "https://github.com/andreygaag/quickbrowser/releases/download/v#{version}/QuickBrowser-#{version}.zip"
   name "QuickBrowser"
