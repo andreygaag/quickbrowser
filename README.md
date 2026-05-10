@@ -22,6 +22,13 @@ A minimalist browser picker for macOS. Intercepts http/https links and either op
 - **SwiftUI config editor** — manage browsers and patterns from the menu bar
 - **Zero dependencies** — single small Swift binary
 
+## System Requirements
+
+- **macOS 13.0 (Ventura)** or later
+- **Apple Silicon or Intel** — universal binary
+- **~2 MB** disk space
+- **No external dependencies**
+
 ## Comparison
 
 QuickBrowser is intentionally narrow: it focuses on fast http/https link routing with a tiny native app, editable config, and automation that reduces repeated choices over time.
