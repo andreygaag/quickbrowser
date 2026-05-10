@@ -216,4 +216,4 @@ Click the globe icon in the menu bar:
 
 ## Version
 
-**v1.3.0** — Pattern-based routing, auto-learning, usage statistics, SwiftUI config editor
+**v1.4.0** — Pattern-based routing, auto-learning, usage statistics, SwiftUI config editor
