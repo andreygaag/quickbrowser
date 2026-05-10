@@ -24,25 +24,33 @@ A minimalist browser picker for macOS. Intercepts http/https links and either op
 
 ## Comparison
 
+QuickBrowser is intentionally narrow: it focuses on fast http/https link routing with a tiny native app, editable config, and automation that reduces repeated choices over time.
+
+- **Small and native** — a Swift app with no Electron runtime or bundled dependencies
+- **Config you own** — plain text rules that are easy to diff, grep, back up, or version-control
+- **Learns your habits** — repeated domain choices can become routing rules automatically
+- **Transparent usage** — built-in stats show which browsers are used manually vs. automatically
+- **Free and open source** — MIT-licensed and easy to inspect or modify
+
 | | QuickBrowser | [Browserosaurus](https://github.com/will-stone/browserosaurus) | [OpenIn](https://loshadki.app/openin4/) | [Choosy](https://choosy.app/) |
 |---|---|---|---|---|
-| **License** | MIT | MIT (archived) | Proprietary | Proprietary |
-| **Price** | Free | Free | $9.99 / Setapp | $10 one-time |
-| **Maintained** | Yes | No (archived 2025) | Yes | Yes |
-| **Tech** | Native Swift | Electron | Native | Native |
-| **App size** | ~2 MB | ~150 MB | — | — |
+| **License** | **MIT** | MIT (archived) | Proprietary | Proprietary |
+| **Price** | **Free** | Free | $9.99 / Setapp | $10 one-time |
+| **Maintained** | **Yes** | No (archived 2025) | Yes | Yes |
+| **Tech** | **Native Swift** | Electron | Native | Native |
+| **App size** | **~2 MB** | ~150 MB | — | — |
 | **Notarized** | No | Yes | Yes | Yes |
-| **Config** | Plain text + GUI | GUI | GUI | GUI |
+| **Config** | **Plain text + GUI** | GUI | GUI | GUI |
 | **URL pattern rules** | Yes | Yes | Yes | Yes (advanced) |
-| **Auto-learning** | Yes | No | No | No |
+| **Auto-learning** | **Yes** | No | No | No |
 | **Source-app rules** | No | No | Yes | Yes |
 | **Browser profiles** | No | No | Yes | Yes |
 | **Time-of-day rules** | No | No | No | Yes |
 | **mailto / files** | No | No | Yes | No |
-| **Usage statistics** | Yes | No | No | No |
+| **Usage statistics** | **Yes** | No | No | No |
 | **Keyboard picker (1-9)** | Yes | Yes | Yes | Yes |
 
-QuickBrowser's niche: small native binary, plain-text config you can grep/version-control, and auto-learning that builds the rule set for you. If you need source-app rules, browser profiles, or mailto/file routing, OpenIn or Choosy will fit better.
+QuickBrowser is the best fit when you want a lightweight, auditable default-browser router that gets out of the way after it learns your common domains. If you need source-app rules, browser profiles, or mailto/file routing, OpenIn or Choosy will fit better.
 
 ## Installation
 
