@@ -9,11 +9,60 @@ TAP_NAME="andreygaag/quickbrowser"
 TAP_REPO="$(brew --repository "$TAP_NAME")"
 TAP_CASK_FILE="$TAP_REPO/Casks/quickbrowser.rb"
 
-VERSION="${1:-$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")}"
+usage() {
+  cat <<'EOF'
+Usage:
+  scripts/release-homebrew.sh [version] [--commit-and-push]
+
+Examples:
+  scripts/release-homebrew.sh
+  scripts/release-homebrew.sh 1.4.0
+  scripts/release-homebrew.sh 1.4.0 --commit-and-push
+
+When version is provided, the script updates Info.plist and README, commits
+"Prepare <version> release", pushes main, publishes the GitHub release assets,
+updates the app repo cask and the Homebrew tap cask.
+
+It also writes a local ignored RELEASE_NOTES.md preview; the GitHub Actions
+workflow regenerates the release notes for the actual GitHub Release.
+
+Commit your code changes before running this script. The script must start from
+a clean app repo and clean Homebrew tap repo.
+
+By default the final cask commits are left for review. Use --commit-and-push
+or COMMIT_AND_PUSH=1 to commit and push both cask updates automatically.
+EOF
+}
+
+REQUESTED_VERSION=""
+COMMIT_AND_PUSH="${COMMIT_AND_PUSH:-0}"
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --commit-and-push)
+      COMMIT_AND_PUSH=1
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      if [ -n "$REQUESTED_VERSION" ]; then
+        echo "Unexpected argument: $1" >&2
+        usage >&2
+        exit 1
+      fi
+      REQUESTED_VERSION="$1"
+      ;;
+  esac
+  shift
+done
+
+VERSION="${REQUESTED_VERSION:-$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")}"
 TAG="v$VERSION"
 ZIP_NAME="QuickBrowser-$VERSION.zip"
 SHA_NAME="$ZIP_NAME.sha256"
-COMMIT_AND_PUSH="${COMMIT_AND_PUSH:-0}"
+RELEASE_NOTES_FILE="$ROOT_DIR/RELEASE_NOTES.md"
 
 cd "$ROOT_DIR"
 
@@ -38,11 +87,52 @@ require_cmd() {
 require_cmd brew
 require_cmd gh
 require_cmd git
+require_cmd perl
 require_cmd rg
 require_cmd ruby
 
 require_clean_repo "$ROOT_DIR" "quickbrowser repo"
 require_clean_repo "$TAP_REPO" "homebrew tap repo"
+
+if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "Version must use semantic form X.Y.Z, got: $VERSION" >&2
+  exit 1
+fi
+
+if [ -n "$REQUESTED_VERSION" ]; then
+  echo "Preparing $VERSION release"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" "$INFO_PLIST"
+  /usr/libexec/PlistBuddy -c "Set :CFBundleVersion ${VERSION##*.}" "$INFO_PLIST"
+  perl -0pi -e "s/\\*\\*v[0-9]+\\.[0-9]+\\.[0-9]+\\*\\*/**v$VERSION**/" "$ROOT_DIR/README.md"
+
+  if ! git diff --quiet -- "$INFO_PLIST" "$ROOT_DIR/README.md"; then
+    git add "$INFO_PLIST" "$ROOT_DIR/README.md"
+    git commit -m "Prepare $VERSION release"
+    git push origin main
+  else
+    echo "Info.plist and README already prepared for $VERSION"
+  fi
+fi
+
+previous_tag="$(git tag --list 'v[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | rg -v "^$TAG$" | head -n 1 || true)"
+if [ -n "$previous_tag" ]; then
+  commit_range="$previous_tag..HEAD"
+else
+  commit_range="HEAD"
+fi
+
+{
+  echo "## QuickBrowser $VERSION"
+  echo
+  if [ -n "$previous_tag" ]; then
+    echo "Changes since $previous_tag:"
+  else
+    echo "Changes:"
+  fi
+  echo
+  git log "$commit_range" --pretty=format:'- %s (%h)' --no-merges
+  echo
+} > "$RELEASE_NOTES_FILE"
 
 plist_version="$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$INFO_PLIST")"
 if [ "$plist_version" != "$VERSION" ]; then
@@ -128,5 +218,5 @@ else
   echo "  git add Casks/quickbrowser.rb && git commit -m 'Update QuickBrowser cask to $VERSION' && git push origin main"
   echo "  cd '$TAP_REPO' && git add Casks/quickbrowser.rb && git commit -m 'Update QuickBrowser to $VERSION' && git push origin main"
   echo
-  echo "Set COMMIT_AND_PUSH=1 to let this script commit and push both repositories."
+  echo "Use --commit-and-push or COMMIT_AND_PUSH=1 to let this script commit and push both repositories."
 fi

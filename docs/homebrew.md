@@ -31,18 +31,18 @@ git push origin main
 
 ### Automated
 
-After updating the app code, version, and README, run:
+After updating and committing the app code, run one command with the new version:
 
 ```bash
-scripts/release-homebrew.sh
+scripts/release-homebrew.sh 1.4.0 --commit-and-push
 ```
 
-The script reads `CFBundleShortVersionString`, creates/pushes `v<version>` if needed, runs the GitHub release workflow, waits for it to finish, downloads the published `.sha256`, updates `Casks/quickbrowser.rb`, copies it into the Homebrew tap, and validates the tap cask.
+The script updates `Info.plist` and README, commits `Prepare <version> release`, writes a local `RELEASE_NOTES.md` preview from commits since the previous version tag, pushes `main`, creates/pushes `v<version>` if needed, runs the GitHub release workflow, waits for it to finish, downloads the published `.sha256`, updates `Casks/quickbrowser.rb`, copies it into the Homebrew tap, validates the tap cask, then commits and pushes both cask updates. The workflow regenerates the release notes for the actual GitHub Release.
 
-By default it leaves commits for review. To commit and push both repositories automatically:
+To review cask changes before committing them, omit `--commit-and-push`:
 
 ```bash
-COMMIT_AND_PUSH=1 scripts/release-homebrew.sh
+scripts/release-homebrew.sh 1.4.0
 ```
 
 ### Manual

@@ -142,3 +142,4 @@ buildServer.json
 # Release artifacts
 QuickBrowser-*.zip
 QuickBrowser-*.zip.sha256
+RELEASE_NOTES.md
