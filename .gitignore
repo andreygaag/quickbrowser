@@ -143,3 +143,4 @@ buildServer.json
 QuickBrowser-*.zip
 QuickBrowser-*.zip.sha256
 RELEASE_NOTES.md
+.playwright-mcp
