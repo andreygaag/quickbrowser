@@ -19,6 +19,8 @@
 		A1000007 /* OverlayWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* OverlayWindow.swift */; };
 		A1000008 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000010 /* main.swift */; };
 		A1000012 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = A2000014 /* AppIcon.icns */; };
+		A1000013 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A2000015 /* Localizable.xcstrings */; };
+		A1000014 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = A2000016 /* InfoPlist.xcstrings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +38,8 @@
 		A2000009 /* QuickBrowser.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = QuickBrowser.entitlements; sourceTree = "<group>"; };
 		A2000010 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		A2000014 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		A2000015 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		A2000016 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		A3000001 /* QuickBrowser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = QuickBrowser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -64,8 +68,18 @@
 				A5000004 /* App */,
 				A5000005 /* Core */,
 				A5000006 /* UI */,
+				A5000007 /* Resources */,
 			);
 			path = QuickBrowser;
+			sourceTree = "<group>";
+		};
+		A5000007 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				A2000015 /* Localizable.xcstrings */,
+				A2000016 /* InfoPlist.xcstrings */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		A5000003 /* Products */ = {
@@ -152,6 +166,9 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				ru,
+				es,
+				Base,
 			);
 			mainGroup = A5000001;
 			productRefGroup = A5000003 /* Products */;
@@ -169,6 +186,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A1000012 /* AppIcon.icns in Resources */,
+				A1000013 /* Localizable.xcstrings in Resources */,
+				A1000014 /* InfoPlist.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

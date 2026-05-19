@@ -25,7 +25,7 @@ final class BrowserListView: NSView {
     private func addHeader() {
         let y = bounds.height - Self.headerHeight
 
-        let label = NSTextField(labelWithString: "Открыть в браузере")
+        let label = NSTextField(labelWithString: String(localized: "Open in browser"))
         label.font = .systemFont(ofSize: 11, weight: .medium)
         label.textColor = .secondaryLabelColor
         label.sizeToFit()
