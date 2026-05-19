@@ -1,13 +1,13 @@
 cask "quickbrowser" do
-  version "1.4.0"
-  sha256 "582e0cf6a4bb958e49fceb91fb923ea8661b9c32d5dde1f504adf1ef00f91278"
+  version "1.5.0"
+  sha256 "fa4a1aaeb1d30025c63f77542f6e136b3a35ef72690f4817da7da0fa561c9ebc"
 
   url "https://github.com/andreygaag/quickbrowser/releases/download/v#{version}/QuickBrowser-#{version}.zip"
   name "QuickBrowser"
   desc "Minimalist browser picker and URL router"
   homepage "https://github.com/andreygaag/quickbrowser"
 
-  depends_on macos: ">= :ventura"
+  depends_on macos: :ventura
 
   app "QuickBrowser.app"
 
