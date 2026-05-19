@@ -25,7 +25,7 @@ final class UsageTracker {
     }
 
     func summary(browsers: [BrowserEntry]) -> String {
-        guard !stats.isEmpty else { return "Нет данных" }
+        guard !stats.isEmpty else { return String(localized: "No data") }
 
         var lines: [String] = []
         var totalManual = 0
@@ -36,13 +36,13 @@ final class UsageTracker {
             guard s.total > 0 else { continue }
             totalManual += s.manual
             totalAuto += s.auto
-            lines.append("\(browser.name): \(s.total)  (\(s.manual) ручных, \(s.auto) авто)")
+            lines.append(String(localized: "\(browser.name): \(s.total)  (\(s.manual) manual, \(s.auto) auto)"))
         }
 
-        guard !lines.isEmpty else { return "Нет данных" }
+        guard !lines.isEmpty else { return String(localized: "No data") }
 
         lines.append("")
-        lines.append("Итого: \(totalManual + totalAuto)  (\(totalManual) ручных, \(totalAuto) авто)")
+        lines.append(String(localized: "Total: \(totalManual + totalAuto)  (\(totalManual) manual, \(totalAuto) auto)"))
 
         return lines.joined(separator: "\n")
     }

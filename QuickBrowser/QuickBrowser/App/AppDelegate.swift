@@ -38,11 +38,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             let alert = NSAlert()
-            alert.messageText = "Браузер по умолчанию"
-            alert.informativeText = "QuickBrowser может перехватывать ссылки, если установлен браузером по умолчанию.\n\nВ настройках выберите QuickBrowser из списка."
+            alert.messageText = String(localized: "Default Browser")
+            alert.informativeText = String(localized: "QuickBrowser can intercept links if it's set as the default browser.\n\nChoose QuickBrowser from the list in System Settings.")
             alert.alertStyle = .informational
-            alert.addButton(withTitle: "Открыть настройки")
-            alert.addButton(withTitle: "Позже")
+            alert.addButton(withTitle: String(localized: "Open Settings"))
+            alert.addButton(withTitle: String(localized: "Later"))
             if alert.runModal() == .alertFirstButtonReturn {
                 self.openDefaultBrowserSettings()
             }
@@ -60,19 +60,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         let menu = NSMenu()
 
         menu.addItem(NSMenuItem(
-            title: "Редактировать конфигурацию",
+            title: String(localized: "Edit Configuration"),
             action: #selector(openConfig),
             keyEquivalent: ""
         ))
 
         menu.addItem(NSMenuItem(
-            title: "Сделать браузером по умолчанию",
+            title: String(localized: "Set as Default Browser"),
             action: #selector(switchDefaultBrowser),
             keyEquivalent: ""
         ))
 
         menu.addItem(NSMenuItem(
-            title: "Статистика",
+            title: String(localized: "Statistics"),
             action: #selector(showStats),
             keyEquivalent: ""
         ))
@@ -80,7 +80,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(
-            title: "О программе",
+            title: String(localized: "About"),
             action: #selector(showAbout),
             keyEquivalent: ""
         ))
@@ -88,7 +88,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         menu.addItem(NSMenuItem.separator())
 
         menu.addItem(NSMenuItem(
-            title: "Выход",
+            title: String(localized: "Quit"),
             action: #selector(quit),
             keyEquivalent: "q"
         ))
@@ -113,7 +113,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         let controller = NSHostingController(rootView: view)
         let win = NSWindow(contentViewController: controller)
-        win.title = "QuickBrowser — Конфигурация"
+        win.title = String(localized: "QuickBrowser — Configuration")
         win.styleMask = [.titled, .closable]
         win.isReleasedWhenClosed = false
         win.delegate = self
@@ -138,20 +138,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     @objc private func showAbout() {
         let alert = NSAlert()
         alert.messageText = "QuickBrowser v1.2"
-        alert.informativeText = """
-        Минималистичное macOS приложение для быстрого выбора браузера.
-
-        Возможности:
-        • Перехват http/https ссылок
-        • CLI-подобный overlay интерфейс
-        • Выбор браузера клавишами 1-9
-        • Автоматический выбор по URL-паттернам
-        • Нет внешних зависимостей
-
-        Конфигурация: ~/.config/quickbrowser
-        """
+        alert.informativeText = String(localized: "A minimalist macOS app for quickly choosing a browser.\n\nFeatures:\n• Intercepts http/https links\n• CLI-like overlay interface\n• Pick a browser with keys 1-9\n• Auto-select by URL patterns\n• No external dependencies\n\nConfiguration: ~/.config/quickbrowser")
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: String(localized: "OK"))
         alert.runModal()
     }
 
@@ -160,17 +149,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if let configData = loadOrCreateConfig() {
             summary = usageTracker.summary(browsers: configData.browsers)
         } else {
-            summary = "Не удалось загрузить конфигурацию"
+            summary = String(localized: "Failed to load configuration")
         }
 
         NSApp.setActivationPolicy(.regular)
         NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
-        alert.messageText = "Статистика использования"
+        alert.messageText = String(localized: "Usage Statistics")
         alert.informativeText = summary
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: String(localized: "OK"))
         alert.runModal()
 
         NSApp.setActivationPolicy(.accessory)
@@ -195,7 +184,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     private func handleURL(_ url: URL) {
         guard let configData = loadOrCreateConfig() else {
-            showAlert(title: "Ошибка", message: "Не удалось загрузить конфигурацию")
+            showAlert(title: String(localized: "Error"), message: String(localized: "Failed to load configuration"))
             NSApp.terminate(nil)
             return
         }
@@ -225,28 +214,28 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         } catch ConfigError.invalidFormat(let line, let content) {
             showAlert(
-                title: "Ошибка конфигурации [v1.2.0]",
-                message: "Неверный формат в строке \(line):\n\"\(content)\""
+                title: String(localized: "Configuration Error"),
+                message: String(localized: "Invalid format on line \(line):\n\"\(content)\"")
             )
             NSApp.terminate(nil)
 
         } catch ConfigError.browserNotFound(let path) {
             showAlert(
-                title: "Браузер не найден",
-                message: "Приложение не существует:\n\(path)"
+                title: String(localized: "Browser Not Found"),
+                message: String(localized: "Application does not exist:\n\(path)")
             )
             NSApp.terminate(nil)
 
         } catch ConfigError.emptyConfig {
             showAlert(
-                title: "Пустая конфигурация",
-                message: "Файл ~/.config/quickbrowser пуст"
+                title: String(localized: "Empty Configuration"),
+                message: String(localized: "The file ~/.config/quickbrowser is empty")
             )
             NSApp.terminate(nil)
 
         } catch {
             showAlert(
-                title: "Ошибка",
+                title: String(localized: "Error"),
                 message: error.localizedDescription
             )
             NSApp.terminate(nil)
@@ -281,8 +270,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             window?.close()
         } catch {
             showAlert(
-                title: "Ошибка запуска",
-                message: "Не удалось открыть браузер:\n\(error.localizedDescription)"
+                title: String(localized: "Launch Error"),
+                message: String(localized: "Failed to open browser:\n\(error.localizedDescription)")
             )
         }
     }
@@ -305,10 +294,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         NSApp.activate(ignoringOtherApps: true)
 
         let alert = NSAlert()
-        alert.messageText = "Запомнить выбор?"
-        alert.informativeText = "Вы \(Self.learningThreshold) раз открывали \(domain) в \(browser.name). Всегда открывать в нём?"
-        alert.addButton(withTitle: "Запомнить")
-        alert.addButton(withTitle: "Не сейчас")
+        alert.messageText = String(localized: "Remember this choice?")
+        alert.informativeText = String(localized: "You opened \(domain) in \(browser.name) \(Self.learningThreshold) times. Always open it there?")
+        alert.addButton(withTitle: String(localized: "Remember"))
+        alert.addButton(withTitle: String(localized: "Not Now"))
 
         let alertWindow = alert.window
         alertWindow.level = .floating
@@ -325,7 +314,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .critical
-        alert.addButton(withTitle: "OK")
+        alert.addButton(withTitle: String(localized: "OK"))
         alert.runModal()
     }
 }

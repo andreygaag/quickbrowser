@@ -27,7 +27,7 @@ struct ConfigEditorView: View {
             patternsSection
             HStack {
                 Spacer()
-                Button("Сохранить") { onSave(browsers, patterns) }
+                Button("Save") { onSave(browsers, patterns) }
                     .buttonStyle(.borderedProminent)
                     .disabled(browsers.isEmpty)
             }
@@ -39,7 +39,7 @@ struct ConfigEditorView: View {
 
     private var browsersSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Браузеры").font(.headline)
+            Text("Browsers").font(.headline)
 
             List {
                 ForEach(browsers) { browser in
@@ -63,7 +63,7 @@ struct ConfigEditorView: View {
             .frame(height: 130)
 
             Button(action: pickBrowser) {
-                Label("Добавить браузер", systemImage: "plus")
+                Label("Add Browser", systemImage: "plus")
             }
             .buttonStyle(.plain)
             .foregroundColor(.accentColor)
@@ -72,7 +72,7 @@ struct ConfigEditorView: View {
 
     private var patternsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Автоматический выбор").font(.headline)
+            Text("Auto-Selection").font(.headline)
 
             List {
                 ForEach(patterns) { p in
@@ -105,7 +105,7 @@ struct ConfigEditorView: View {
                 .frame(width: 130)
                 .disabled(browsers.isEmpty)
 
-                Button("Добавить") { addPattern() }
+                Button("Add") { addPattern() }
                     .disabled(newDomain.trimmingCharacters(in: .whitespaces).isEmpty || browsers.isEmpty)
             }
         }
@@ -117,7 +117,7 @@ struct ConfigEditorView: View {
         panel.canChooseDirectories = true
         panel.allowedContentTypes = [.applicationBundle]
         panel.directoryURL = URL(fileURLWithPath: "/Applications")
-        panel.title = "Выберите браузер"
+        panel.title = String(localized: "Choose a browser")
 
         guard panel.runModal() == .OK, let url = panel.url else { return }
         let nextKey = String((browsers.compactMap { Int($0.key) }.max() ?? 0) + 1)
